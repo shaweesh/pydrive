@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Attachments</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .file-icon {
+            font-size: 2rem;
+            color: #4a5568;
+        }
+
+        .pdf-icon {
+            color: #e53e3e;
+        }
+
+        .doc-icon {
+            color: #2b6cb0;
+        }
+
+        .image-icon {
+            color: #48bb78;
+        }
+
+        .default-icon {
+            color: #718096;
+        }
+
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar {
+            background-color: #4A90E2;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: inline-block;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #357ABD;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="navbar fixed top-0 inset-x-0 py-4 shadow-md z-10">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{{ url_for('dashboard') }}" class="text-2xl font-bold">Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="flex items-center text-red-500">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto mt-24 p-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Uploaded Attachments</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            {% for attachment in attachments %}
+            <div class="card bg-white p-4 rounded-lg shadow-md flex items-center hover:cursor-pointer">
+                <div class="flex-shrink-0">
+                    {% set icon_class = {
+                    '.pdf': 'pdf-icon fas fa-file-pdf',
+                    '.doc': 'doc-icon fas fa-file-word',
+                    '.docx': 'doc-icon fas fa-file-word',
+                    '.jpg': 'image-icon fas fa-file-image',
+                    '.jpeg': 'image-icon fas fa-file-image',
+                    '.png': 'image-icon fas fa-file-image'
+                    }.get(attachment[3], 'default-icon fas fa-file') %}
+                    <i class="{{ icon_class }} file-icon"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-bold text-gray-800">{{ attachment[0] }}</h3>
+                    <p class="text-gray-600">Uploaded on: {{ attachment[1] }}</p>
+                    <div class="mt-2 flex justify-between">
+                        <a href="{{ url_for('download', message_id=attachment[2]) }}"
+                            class="text-blue-500 hover:underline">Download</a>
+                        <form method="post" action="{{ url_for('delete_attachment', message_id=attachment[2]) }}"
+                            class="inline">
+                            <input type="submit" value="Delete" class="text-red-500 hover:underline">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mt-4">
+            <a href="{{ url_for('dashboard') }}"
+                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Back to Dashboard</a>
+        </div>
+        <!-- Pagination Controls -->
+        <div class="mt-6 flex justify-between">
+            {% if page > 1 %}
+            <a href="{{ url_for('attachments', page=page-1) }}"
+                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Previous</a>
+            {% endif %}
+            {% if page < total_pages %} <a href="{{ url_for('attachments', page=page+1) }}"
+                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Next</a>
+                {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>
